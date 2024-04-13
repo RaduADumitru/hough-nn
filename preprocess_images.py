@@ -53,7 +53,7 @@ for image_file in image_files:
 
         # Iterate over the labels and assign each pixel inside an object its corresponding label
         for i in range(1, num_labels):
-            # Check if the label corresponds to a white pixel
+            # Check if the label corresponds to a white pixel: if so, don't assign the label
             if np.mean(original_image[labels == i]) < 255:
                 labelled_image[labels == i] = i
 
