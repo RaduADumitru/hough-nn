@@ -21,6 +21,7 @@ def plot_function(f, image, image_name, processor_min, processor_max):
     axs[0].plot(processors, execution_times)
     axs[0].set(xlabel='Number of Processors', ylabel='Execution time (s)',
        title=f'Execution time vs. Number of Processors')
+    
     # get time of sequential execution
     start_time = time.time()
     f(1, image)
@@ -32,11 +33,6 @@ def plot_function(f, image, image_name, processor_min, processor_max):
     axs[1].plot(processors, acceleration)
     axs[1].set(xlabel='Number of Processors', ylabel='Acceleration',
        title=f'Acceleration vs. Number of Processors')
-    # plt.plot(processors, acceleration)
-    # plt.xlabel('Number of Processors')
-    # plt.ylabel('Acceleration')
-    # plt.title(f'Image {image_name}: Acceleration vs. Number of Processors')
-    # plt.show()
 
     # calculate efficiency
     efficiency = [acceleration[i] / processors[i] for i in range(len(processors))]
@@ -45,9 +41,3 @@ def plot_function(f, image, image_name, processor_min, processor_max):
        title=f'Efficiency vs. Number of Processors')
     
     plt.show()
-
-    # plt.plot(processors, efficiency)
-    # plt.xlabel('Number of Processors')
-    # plt.ylabel('Efficiency')
-    # plt.title(f'Image {image_name}: Efficiency vs. Number of Processors')
-    # plt.show()

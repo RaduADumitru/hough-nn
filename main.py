@@ -6,7 +6,7 @@ import hough_transform
 import nearest_neighbors
 
 if __name__ == "__main__":
-    # load images
+    # load Hough images
     # specify the directory containing the images
     hough_image_directory = 'images/binary'
 
@@ -24,6 +24,7 @@ if __name__ == "__main__":
         # TODO: replace function call with hough_transform.hough_transform
         plot.plot_function(sample_functions.sample_function, image, image_file, 1, 8)
     
+    # load nearest-neighbors images, same as above but for nearest-neighbors
     nearest_neighbors_image_directory = 'images/labeled'
     nearest_neighbors_image_files = os.listdir(nearest_neighbors_image_directory)
     for image_file in nearest_neighbors_image_files:
