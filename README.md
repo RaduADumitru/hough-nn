@@ -8,6 +8,6 @@ Parallel Hough Transform &amp; Nearest Neighbours image algorithms
   - Will preprocess all images under the aforementioned folder
 - To run hough transform: `mpiexec -n 2 python hough.py`
   - Store results as a csv file in `results/hough`
-- plot results using `plot_csv.py`
+- plot results using `plot_from_csv.py`, specifying desired path in script
 
 
