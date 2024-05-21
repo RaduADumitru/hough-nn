@@ -6,6 +6,8 @@ Parallel Hough Transform &amp; Nearest Neighbours image algorithms
   - Additionally, the background must be white - the program will consider white pixels as not being part of any objects
 - Run image preprocessing: `preprocess_images.py`
   - Will preprocess all images under the aforementioned folder
-- Run `main.py` - it should execute hough transform and nearest neighbors algorithms on all images within `images/original`, and plot performance metrics
+- To run hough transform: `mpiexec -n 2 python hough.py`
+  - Store results as a csv file in `results/hough`
+- plot results using `plot_from_csv.py`, specifying desired path in script
 
 
