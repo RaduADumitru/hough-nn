@@ -2,6 +2,7 @@ from mpi4py import MPI
 import numpy as np
 import cv2
 import time
+import os
 import matplotlib.pyplot as plt
 
 
@@ -174,4 +175,8 @@ if rank == 0:
     print(f"Time taken: {end_time - start_time:.4f} seconds")
 
     image = compute_image(width, height, total_nn, theta, (0, num_rhos))
+    # Create images/nn directory if it doesn't exist
+    if not os.path.exists('images/nn'):
+        os.makedirs('images/nn')
+
     plt.imsave('images/nn/hough_nn-{}.png'.format(int(np.rad2deg(theta))), image, cmap='gray')
