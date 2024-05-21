@@ -34,7 +34,7 @@ def get_bands(image, theta, rho_range, rho_res):
     return bands
 
 
-def compute_image(width, height, bands, theta, rho_range):
+def compute_image(width, height, bands: list, theta, rho_range):
     diag_len = int(np.sqrt(width**2 + height**2))
     num_rhos = int((2 * diag_len) / rho_res)
     start_rho, end_rho = rho_range
@@ -54,14 +54,14 @@ def compute_image(width, height, bands, theta, rho_range):
             rho = int(round(x * cos_theta + y * sin_theta) /
                         rho_res + num_rhos / 2)
             if start_rho <= rho < end_rho:
-                pixel = bands[rho - start_rho].pop()
+                pixel = bands[rho - start_rho].pop(0)
 
                 if pixel == -1:
-                    image[x, y] = 0
+                    image[x, y] = 255
                 else:
                     image[x, y] = pixel
 
-    return np.flip(np.flip(np.rot90(image)), axis=1)
+    return image
 
 
 def get_nn(bands):
@@ -73,10 +73,10 @@ def get_nn(bands):
     for band in bands:
         nn_band, nn_dist_band = [], []
 
-        if len(band) == 0 or len(band) == 1:
+        if len(band) == 1:
             nn_band.append(-1)
             nn_dist_band.append(-1)
-        else:
+        elif len(band) != 0:
             for i, p in enumerate(band):
                 if p == 0:
                     nn_band.append(-1)
@@ -86,14 +86,14 @@ def get_nn(bands):
                 left_n, right_n = None, None
 
                 for j in range(i-1, -1, -1):
-                    if band[j] != p:
+                    if band[j] != p and band[j] != 0:
                         left_n = j
-                        break
+                        continue
 
                 for j in range(i+1, len(band)):
-                    if band[j] != p:
+                    if band[j] != p and band[j] != 0:
                         right_n = j
-                        break
+                        continue
 
                 n = None
                 if left_n == right_n == None:
@@ -102,15 +102,22 @@ def get_nn(bands):
                 elif left_n == None:
                     n = right_n
                     nn_band.append(band[n])
-                    nn_dist_band.append([right_n - i])
+                    nn_dist_band.append(right_n - i)
                 elif right_n == None:
                     n = left_n
                     nn_band.append(band[n])
-                    nn_dist_band.append([i - left_n])
+                    nn_dist_band.append(i - left_n)
                 else:
-                    n = min(left_n, right_n)
-                    nn_band.append(band[n])
-                    nn_dist_band.append(np.abs(n-i))
+                    left_dist = i - left_n
+                    right_dist = right_n - i
+                    min_dist = min(left_dist, right_dist)
+
+                    if min_dist == left_dist:
+                        nn_band.append(band[left_n])
+                    else:
+                        nn_band.append(band[right_n])
+
+                    nn_dist_band.append(min_dist)
 
         nn_bands.append(nn_band)
         nn_dist_bands.append(nn_dist_band)
@@ -143,11 +150,15 @@ rho_range = (start_rho, end_rho)
 
 theta = np.deg2rad(45)
 
+start_time = time.time()
+
 partial_bands = get_bands(image, theta, rho_range, rho_res)
 partial_nn, partial_nn_dist = get_nn(partial_bands)
 
 total_nn = comm.gather(partial_nn, root=0)
 total_nn_dist = comm.gather(partial_nn_dist, root=0)
+
+end_time = time.time()
 
 if rank == 0:
     concat = []
@@ -159,6 +170,8 @@ if rank == 0:
     for list in total_nn_dist:
         concat += list
     total_nn_dist = concat
+
+    print(f"Time taken: {end_time - start_time:.4f} seconds")
 
     image = compute_image(width, height, total_nn, theta, (0, num_rhos))
     plt.imsave('images/nn/hough_nn-{}.png'.format(int(np.rad2deg(theta))), image, cmap='gray')
