@@ -1,7 +1,7 @@
 import os
 import csv
 import matplotlib.pyplot as plt
-filename = os.path.join('results', 'hough', 'setup_1.csv')
+filename = os.path.join('results', 'hough', 'setup_2.csv')
 
 processor_counts = []
 execution_times = []
